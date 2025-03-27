@@ -1,3 +1,4 @@
+#auth.py
 from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
@@ -84,3 +85,4 @@ def fetch_courses():
 
     courses = get_courses_by_teacher(teacher_id)
     return jsonify({"courses": courses}), 200
+

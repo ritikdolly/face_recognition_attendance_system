@@ -65,7 +65,8 @@ export const getCoursesByTeacher = async (teacherId) => apiRequest(`auth/get_cou
 export const getCourseDetails = async (courseId) => apiRequest(`attendance/course/${courseId}`, "GET");
 
 // ✅ Attendance APIs
-export const markAttendance = async (attendanceData) => apiRequest("attendance/mark_student_attendance", "POST", attendanceData);
+// export const markAttendance = async (attendanceData) => apiRequest("attendance/uploads", "POST", attendanceData);
+
 export const getAttendanceByCourse = async (courseId) => apiRequest(`attendance?courseId=${courseId}`, "GET");
 
 // ✅ Teacher APIs

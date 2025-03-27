@@ -1,12 +1,12 @@
 from flask import Flask
 from flask_cors import CORS
 from routes.auth import auth_bp
-from routes.attendance import attendance_bp
+from routes.attendance import attendance_bp # Import the attendance blueprint
 
 app = Flask(__name__)
 
-# Proper CORS configuration for handling preflight requests
-CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173"}}, supports_credentials=True, methods=["GET", "POST", "OPTIONS", "PUT", "DELETE"], allow_headers=["Content-Type", "Authorization"])
+# Configure CORS properly
+CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
 
 # Register Blueprints
 app.register_blueprint(auth_bp, url_prefix="/api/auth")  

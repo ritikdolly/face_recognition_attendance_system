@@ -1,3 +1,4 @@
+#db.py
 from pymongo import MongoClient
 from config import MONGO_URI  # Ensure MONGO_URI is correctly set in config.py
 

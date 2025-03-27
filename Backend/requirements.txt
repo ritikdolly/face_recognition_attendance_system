@@ -1,0 +1,9 @@
+# requirements.txt
+flask
+flask-cors
+pymongo
+face_recognition
+pillow
+numpy
+pyjwt
+werkzeug
