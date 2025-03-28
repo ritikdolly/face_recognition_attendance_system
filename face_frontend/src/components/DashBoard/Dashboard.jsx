@@ -9,7 +9,7 @@ export const Dashboard = () => {
         <Sidebar />
         <div className="flex flex-col flex-grow h-screen w-full">
           <Navbar />
-          <div className="flex-grow bg-gray-50 p-4">
+          <div className="flex-grow bg-gray-50 ">
             <Outlet /> {/* ✅ This ensures child components render correctly */}
           </div>
         </div>

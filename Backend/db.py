@@ -9,8 +9,6 @@ try:
     # Check if the database connection is active
     if db is not None:
         trained_data_collection = db["CourseTrainingData"]  # Stores trained data for face recognition
-        attendance_summary_collection = db["AttendanceSummary"]  # Stores attendance summaries
-        student_attendance_collection = db["StudentAttendance"]  # Stores detailed student attendance records
         user_collection = db["teacher"]  # Stores registered users and their credentials
 
         print("✅ Collections initialized successfully")

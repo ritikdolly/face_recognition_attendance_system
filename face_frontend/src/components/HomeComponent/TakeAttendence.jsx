@@ -2,13 +2,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef, useState } from "react";
 import { data, useParams } from "react-router-dom";
+import PresentList from "./PresentList";
 
 export const TakeAttendance = () => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const [capturedImage, setCapturedImage] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [regNo, setRegNos] = useState([]);
+  const [regNos, setRegNos] = useState([]);
 
   const teacherId = localStorage.getItem("teacherId");
   const { courseName } = useParams();
@@ -59,8 +60,8 @@ export const TakeAttendance = () => {
 
   // Use useEffect to log after state update
   useEffect(() => {
-    console.log("Final Updated Reg Nos:", regNo);
-  }, [regNo]); // Runs whenever regNos updates
+    console.log("Final Updated Reg Nos:", regNos);
+  }, [regNos]); // Runs whenever regNos updates
 
   const sendImageForRecognition = async (imageBlob) => {
     if (!imageBlob) {
@@ -80,7 +81,7 @@ export const TakeAttendance = () => {
 
     try {
       const response = await fetch(
-        "http://127.0.0.1:5000/api/attendance/uploads",
+        "http://127.0.0.1:5000/api/attendance/recognize",
         {
           method: "POST",
           body: formData,
@@ -142,45 +143,8 @@ export const TakeAttendance = () => {
         </div>
 
         {/* Student List Section */}
-        <div className="w-1/3 p-6">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-            Recognized Students
-          </h2>
-          <div className="max-h-96 overflow-y-auto border border-gray-300 rounded-lg shadow-md">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-green-500 text-white text-center">
-                  <th className="p-3">S No.</th>
-                  <th className="p-3">Student Reg</th>
-                </tr>
-              </thead>
-              <tbody>
-                {regNo.length > 0 ? (
-                  regNo.map((student, index) => (
-                    <tr
-                      key={index}
-                      className="border-t text-center border-gray-300 odd:bg-gray-50 even:bg-white"
-                    >
-                      <td className="p-3 font-medium">{index + 1}</td>
-                      <td className="p-3">{student}</td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    
-                    <td
-                      colSpan="2"
-                      className="p-3 text-center text-gray-500"
-                    >NO Data Present</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-          <p className="text-lg font-medium text-gray-800 mt-4">
-            Total Recognized: {regNo.length}
-          </p>
-        </div>
+         {/* Student List Section (Moved to PresentList component) */}
+         <PresentList regNos={regNos} />
       </div>
     </div>
   );
