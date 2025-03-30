@@ -1,30 +1,34 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { getSessionsByTeacher } from "../../Api/Request";
+import { useNavigate } from "react-router-dom";
 
 export const SessionsTable = () => {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const navigate = useNavigate();
+
   const teacherId = localStorage.getItem("teacherId");
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:5000/api/attendance/sessions?teacherId=${teacherId}`)
-      .then((response) => {
-        setSessions(response.data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching sessions:", error);
-        setError("Failed to fetch sessions");
-        setLoading(false);
-      });
+    if (teacherId) {
+      getSessionsByTeacher(teacherId)
+        .then((response) => {
+          if (response.status) {
+            setSessions(response.data);
+          } else {
+            setError(response.data.message || "Failed to fetch sessions");
+          }
+          setLoading(false);
+        })
+        .catch(() => {
+          setError("Network error, please try again later.");
+          setLoading(false);
+        });
+    }
   }, [teacherId]);
 
-  const handleEdit = (id) => {
-    console.log("Edit session", id);
-  };
 
   return (
     <div className="p-6 bg-purple-800 min-h-screen flex justify-center">
@@ -36,7 +40,7 @@ export const SessionsTable = () => {
         ) : error ? (
           <p className="text-center text-red-600 mt-4">{error}</p>
         ) : sessions.length === 0 ? (
-          <p className="text-center text-gray-600 mt-4">No sessions available</p>
+          <p className="text-center text-gray-600 mt-4">No Course is available</p>
         ) : (
           <div className="overflow-x-auto mt-4">
             <table className="min-w-full bg-white border border-gray-300">
@@ -50,13 +54,13 @@ export const SessionsTable = () => {
               </thead>
               <tbody>
                 {sessions.map((session, index) => (
-                  <tr key={session._id} className="border-b hover:bg-gray-100">
+                  <tr key={session._id || `session-${index}`} className="border-b hover:bg-gray-100">
                     <td className="p-3 text-center">{index + 1}</td>
                     <td className="p-3 text-center">{session.courseName}</td>
                     <td className="p-3 text-center">{session.numStudents}</td>
                     <td className="p-3 text-center">
                       <button
-                        onClick={() => handleEdit(session._id)}
+                         onClick={() => navigate(`/check-attendance/${session.courseName}`)}
                         className="text-blue-500 hover:text-blue-700"
                       >
                         Details

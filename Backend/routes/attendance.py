@@ -12,6 +12,8 @@ from pymongo import MongoClient
 from datetime import datetime
 from pydantic import BaseModel
 from typing import List
+from datetime import datetime
+from bson import ObjectId
 
 app = FastAPI()
 
@@ -126,10 +128,7 @@ def mark_attendance():
 
 
 
-
-
-
-    
+# ✅ Define a Pydantic model for the attendance record
 @attendance_bp.route("/sessions", methods=["GET"])
 def get_sessions():
     teacher_id = request.args.get("teacherId")
@@ -141,3 +140,78 @@ def get_sessions():
         return jsonify(sessions), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+@attendance_bp.route('/check_attendance/', methods=['POST'])
+def get_attendance_sessions():
+    teacher_id = request.args.get("teacherId")
+    course_name = request.args.get("courseName")  # Get courseName from URL
+
+    if not teacher_id or not course_name:
+        return jsonify({"error": "teacherId and courseName are required"}), 400
+
+    sessions = courses_collection.find({
+        "teacherId": teacher_id,
+        "courseName": course_name  # Ensure only the selected course is retrieved
+    })
+
+    result = []
+    for session in sessions:
+        attendance_records = session.get("attendance", [])
+
+        for record in attendance_records:
+            for timestamp, details in record.items():
+                present_count = len(details.get("present", []))
+                absent_count = len(details.get("absent", []))
+
+                result.append({
+                    "date": timestamp.split(), 
+                    # "date": timestamp.split()[0],
+                    # "time": timestamp.split()[1],
+                    "present": present_count,
+                    "absent": absent_count,
+                    "totalStudents": present_count + absent_count
+                })
+
+    return jsonify(result)
+
+
+
+@attendance_bp.route("/List_Of_Present_Absent", methods=["GET"])
+def get_attendance_details():
+    teacher_id = request.args.get("teacherId")
+    course_name = request.args.get("courseName")
+    date = request.args.get("date")
+    time = request.args.get("time")
+
+    if not teacher_id or not course_name or not date or not time:
+        return jsonify({"status": False, "message": "Missing required parameters"}), 400
+
+    # Convert date and time format to match MongoDB storage
+    try:
+        formatted_date = datetime.strptime(date, "%m/%d/%Y").strftime("%Y-%m-%d")
+        formatted_time = datetime.strptime(time, "%I:%M:%S %p").strftime("%H:%M:%S")
+        date_time = f"{formatted_date} {formatted_time}"
+    except ValueError:
+        return jsonify({"status": False, "message": "Invalid date/time format"}), 400
+
+    # Debugging logs
+    # print(f"Received Params - Teacher ID: {teacher_id}, Course Name: {course_name}, Date-Time: {date_time}")
+
+    # Find the course document
+    course = courses_collection.find_one({"teacherId": teacher_id, "courseName": course_name})
+
+    if not course:
+        return jsonify({"status": False, "message": "Course not found"}), 404
+
+    # Find attendance entry for the given date-time
+    attendance_list = course.get("attendance", [])
+    for record in attendance_list:
+        if date_time in record:
+            return jsonify({
+                "status": True,
+                "dateTime": date_time,
+                "present": record[date_time].get("present", []),
+                "absent": record[date_time].get("absent", [])
+            })
+
+    return jsonify({"status": False, "message": "Attendance not found for the given date-time"}), 404

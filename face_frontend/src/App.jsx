@@ -1,3 +1,5 @@
+
+
 import "./App.css";
 import { LoginPage } from "./components/Auth/LoginPage";
 import { RegisterPage } from "./components/Auth/RegisterPage";
@@ -13,6 +15,7 @@ import { HomePage } from "./components/HomeComponent/HomePage";
 import { CheckAttendance } from "./components/HomeComponent/CheckAttendance";
 import { TakeAttendance } from "./components/HomeComponent/TakeAttendence";
 import { NewClass } from "./components/DashBoard/NewClass";
+import { AttendanceListOfEachDate } from "./components/HomeComponent/AttendanceListOfEachDate";
 
 const router = createBrowserRouter([
   {
@@ -37,8 +40,11 @@ const router = createBrowserRouter([
           { path: "attendance/:courseName", element: <TakeAttendance /> }, // ✅ Route for dynamic attendance pages
           {
             path: "check-attendance/:courseName",
-            element: <CheckAttendance />,
-          }, // ✅ Route for checking attendance
+            element: <CheckAttendance />},
+          {
+            path: "attendancePerDate/:courseName/:date/:time",
+            element: <AttendanceListOfEachDate />,
+          }
         ],
       },
     ],
